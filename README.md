@@ -3,7 +3,7 @@
 **[Token Metadata with Token Extensions on Solana](https://www.youtube.com/watch?v=l7EyQUlNAdw)**
 
 
-> Full written guide on the Token Metadata token extension: [**How to use the Metadata Pointer extension | Solana**](https://solana.com/developers/guides/token-extensions/metadata-pointer). > The Token Extensions Program directly implements the SPL Token Metadata Interface, made accessible through the Token Metadata extension. With the Token Metadata extension, the Mint Account itself can now store the metadata directly on the Solana blockchain.
+> Full written guide on the Token Metadata token extension: [**How to use the Metadata Pointer extension | Solana**](https://solana.com/developers/guides/token-extensions/metadata-pointer). The Token Extensions Program directly implements the SPL Token Metadata Interface, made accessible through the Token Metadata extension. With the Token Metadata extension, the Mint Account itself can now store the metadata directly on the Solana blockchain.
 
 --------
 <!-- TOC -->
