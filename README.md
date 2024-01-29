@@ -3,9 +3,9 @@
 **[Token Metadata with Token Extensions on Solana](https://www.youtube.com/watch?v=l7EyQUlNAdw)**
 
 
+> Full written guide on the Token Metadata token extension: [**How to use the Metadata Pointer extension | Solana**](https://solana.com/developers/guides/token-extensions/metadata-pointer). > The Token Extensions Program directly implements the SPL Token Metadata Interface, made accessible through the Token Metadata extension. With the Token Metadata extension, the Mint Account itself can now store the metadata directly on the Solana blockchain.
 
-
-
+--------
 <!-- TOC -->
 
 - [Introduction to Using the Metadata Token Extension](#introduction-to-using-the-metadata-token-extension)
@@ -31,44 +31,55 @@
 - [Building Transaction with Instructions](#building-transaction-with-instructions)
 - [Sending and Confirming Transaction](#sending-and-confirming-transaction)
 - [Logging Out the Signature](#logging-out-the-signature)
-	- [Logging Out the Signature](#logging-out-the-signature)
 - [Conclusion](#conclusion)
 - [Transcription](#transcription)
 
 <!-- /TOC -->
 
+--------
 
 
-[**`00:15`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=15) 
+[**`00:15`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=15)
 # Introduction to Using the Metadata Token Extension
 
-In this video, Nick from the **Solana Foundation** Deell team explains how to use the metadata token extension on the new **SPL token** extension program. He demonstrates the process using **VS Code** and provides step-by-step instructions.
+In this video, Nick from the **Solana Foundation Developer Team** explains how to use the metadata token extension on the new **SPL token** extension program. He demonstrates the process using **VS Code** and provides step-by-step instructions.
 
 ## Initializing the Project and Installing Dependencies
 
-- Use `yarn init -y` to initialize a project JSON file.
+![](assets/2024-01-29-09-48-29.png)
+
+
+- [**`00:38`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=38) Use `yarn init -y` to initialize a project JSON file.
 - Install TypeScript support, Solana Web3JS, SPL token package, token metadata, and Solana Developers Helper package as dependencies.
 
 ## Loading Key Pair and Creating Connection
 
-- Load a key pair with devet soul.
-- Create a connection to the cluster using devet.
+![](assets/2024-01-29-10-04-30.png)
+
+- [**`02:00`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=120) Load a key pair with devnet sol.
+- Create a connection to the cluster using devnet.
 - Use the helper library to load the key pair from the file system.
 
 ## Generating a New Random Mint Address
 
-- Generate a new random mint address using `key.generate()`.
+![](assets/2024-01-29-10-07-34.png)
+
+- [**`02:29`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=149) Generate a new random mint address using `Keypair.generate()`.
 - Log out the mint address and payer addresses for verification.
 
 ## Filling in Metadata Information
 
-- Create a new object called "metadata" of type TokenMetadata format.
-- Fill in required fields such as mint address, name, symbol, and URI (JSON file located off-chain).
-- Add additional metadata information as key-value pairs within an array.
+![](assets/2024-01-29-10-11-43.png)
+
+- [**`03:04`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=184) Create a new object called "metadata" of type TokenMetadata format.
+- [**`03:24`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=204) Fill in required fields such as mint address, name, symbol, and URI (JSON file located off-chain).
+- [**`04:58`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=298) Add additional metadata information as key-value pairs within an array.
 
 ## Calculating Mint Space
 
-- Use `getMintLength()` function from SPL token packages to calculate mint space needed for extensions.
+![](assets/2024-01-29-10-16-10.png)
+
+- [**`05:18`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=318) Use `getMintLength()` function from SPL token packages to calculate **mint space needed for extensions**.
 - Pass in an array of extensions being used (in this case, only metadata extension).
 
 [**`05:52`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=352)
@@ -93,28 +104,48 @@ This section explains how to calculate space for token extensions. It mentions t
 
 ## Calculating Space for Token Extensions
 
-- Space calculation for token extensions differs from other token extensions.
-- Constant values from the SPL token package act as discriminators.
-- Two bytes each are allocated for type size and length size.
+```javascript
+import { ExtensionType, TYPE_SIZE, LENGTH_SIZE, getMinLen } from "@solan/spl-token";
+
+...
+
+const metadataSpace = TYPE_SIZE + LENGTH_SIZE + ...
+```
+
+- [**`06:42`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=402) Space calculation for token extensions differs from other token extensions.
+- [**`07:08`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=428) Constant values from the SPL token package act as discriminators.
+- [**`07:23`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=443) Two bytes each are allocated for `TYPE_SIZE` and `LENGTH_SIZE`.
 
 [**`06:53`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=413)
 # Determining Length of Metadata
 
-Here, it is explained how to determine the actual length of metadata. The pack function from within the SPL token metadata package can be used to obtain this information.
+Here, it is explained how to determine the actual length of metadata. The `pack()` function from within the SPL token metadata package can be used to obtain this information.
 
 ## Determining Length of Metadata
 
-- Use the pack function from within the SPL token metadata package.
+```javascript
+const metadataSpace = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length
+```
+
+- @@07:37 Use the pack function from within the SPL token metadata package.
 - Pass in your metadata object to get the actual on-chain space needed.
 
 [**`07:28`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=448)
 # Allocating Lamp Ports for Mint
 
-This section discusses allocating lamp ports (minimum balance for rent exemption) for mint creation. By adding together mint space and metadata space, you can determine how many lamp ports are needed.
+This section discusses allocating lampports (*minimum balance for rent exemption*) for mint creation. By adding together mint space and metadata space, you can determine how many lamp ports are needed.
 
 ## Allocating Lamp Ports for Mint
 
-- Add mint space and metadata space to determine the total lamp ports needed.
+```javascript
+const metadataSpace = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length
+
+const lamports = await connection.getMinimumBalanceForRentExemption(
+    mintspace + metadatSpace
+)
+```
+
+- [**`08:10`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=490) Add mint space and metadata space to determine the total lamp ports needed.
 - This determines the minimum balance for rent exemption.
 
 [**`08:04`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=484)
@@ -124,26 +155,69 @@ Here, the speaker explains how to build instructions for token creation. The fir
 
 ## Building Instructions for Token Creation
 
-- Create the account on-chain by initializing it using the system program class.
-- Use the create account instruction from the system program class.
-- Pass in necessary information such as payer pubkey, new account pubkey, mint space, and program ID.
+```javascript
+const createAccountIx = systemProgram.createAccount({
+    fromPubKey      : payer.publicKey,
+    newAccountPubkey: mint.publicKey,
+    lamport         : lamports,
+    programId       : TOKEN_2022_PROGRAM_ID  // from `spl-token` package
+})
+```
 
-[**`08:21`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=501)
+- [**`08:27`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=507) Create the account on-chain by initializing it using the system program class.
+- [**`08:40`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=520) Use the `createAccount()` instruction from the system program class.
+- [**`10:05`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=605) Pass in necessary information such as payer pubkey, new account pubkey, mint space, and program ID.
+
+[**`10:16`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=616)
 # Initializing Metadata and Mint
 
-This section covers initializing metadata and mint. The metadata initialization uses a helper function from the SPL token package. The mint initialization uses another helper function called "create initialize mint."
+This section covers initializing metadata and mint. The metadata initialization uses a helper function from the `spl-token` package. The mint initialization uses another helper function called "create initialize mint."
 
 ## Initializing Metadata and Mint
 
-- Initialize metadata using a helper function from the SPL token package.
-- Pass in parameters such as mint pubkey, update authority, metadata pointer (which can be set as the mint itself), and token program ID.
-- Initialize mint using a helper function called "create initialize mint."
-- Pass in parameters such as mint pubkey, number of decimals, mint authority (can be same as payer), and freeze authority if needed.
+```javascript
+const initializeMetadataPointerIx = createInitializeMetadataPointerInstruction({
+    mint.publicKey,
+    payer.publicKey,
+    mint.publicKey,
+    TOKEN_2022_PROGRAM_ID
+})
+
+const initializeMintIx = createInitializeMintInstruction({
+    mint.publicKey,
+    2, // decimals
+    payer.publicKey,
+    null,
+})
+```
+
+- [**`10:30`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=630) **Initialize metadata** using a helper function from the `spl-token` package.
+- [**`11:25`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=685) Pass in parameters such as mint pubkey, update authority, metadata pointer (which can be set as the mint itself), and token program ID.
+- [**`11:35`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=695) Initialize mint using a helper function called `createInitializeMintInstruction`.
+- [**`12:19`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=739) Pass in parameters such as mint pubkey, number of decimals, mint authority (*can be same as payer*), and freeze authority if needed.
 
 [**`12:28`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=748)
 # Initializing the Metadata Account
 
-In this section, we learn about initializing the metadata account using the SPL token metadata package. The instruction for initialization is called "create initialize" and it takes similar parameters to other instructions. We pass in the mint key, metadata account key (which is also the mint key in this case), and optionally, the mint authority.
+[**`12:44`**](https://youtu.be/l7EyQUlNAdw?t=764)
+ In this section, we learn about initializing the metadata account using the SPL token metadata package. The instruction for initialization is called "create initialize" and it takes similar parameters to other instructions. We pass in the mint key, metadata account key (which is also the mint key in this case), and optionally, the mint authority.
+
+```javascript
+import { TokenMetadata, createInitializeInstruction } from from "@solana/spl-token-metadata";
+
+...
+
+const initializeMetadataIx = createInitializeInstruction({
+    mint           : mint.publicKey,
+    metadata       : mint.publicKey,
+    mintAuthority  : payer.publicKey,
+    name           : metadata.name,
+    symbol         : metadata.symbol,
+    uri            : metadata.uri,
+    programId      : TOKEN_2022_PROGRAM_ID,
+    updateAuthority: payer.publicKey
+});
+```
 
 - The create initialize instruction is used to initialize the metadata account.
 - Parameters include the mint key, metadata account key (same as mint key), and optionally, the mint authority.
@@ -152,21 +226,41 @@ In this section, we learn about initializing the metadata account using the SPL 
 [**`14:20`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=860)
 # Initializing Onchain Metadata Fields
 
-Here we discuss how to initialize individual onchain metadata fields using separate instructions. We demonstrate how to create an instruction for updating a single field.
+[**`14:40`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=880) Here we discuss how to initialize individual onchain metadata fields using separate instructions. We demonstrate how to create an instruction for updating a single field.
+
+```javascript
+const updateMetadataField = createUpdateFieldInstruction({
+    metadata       : mint.publicKey,
+    programId      : TOKEN_2022_PROGRAM_ID,
+    updateAuthority: payer.publicKey,
+    field          : metadata.additionalMetadata[0][0],
+    value          : metadata.additionalMetadata[0][1]
+});
+```
 
 - To update individual onchain metadata fields, we use separate instructions.
-- We can create an instruction for updating a specific field using "create update field" from SPL token metadata package.
-- Parameters include the metadata account key (mint key), program ID (token 22), update authority (same as metadata pointer's payer dopu key).
-- Each field has its own index in the additional fields array. We can extract values from our existing additional fields array by specifying their respective indices.
+- [**`15:00`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=900) We can create an instruction for updating a specific field using `createUpdateFieldInstruction()` from SPL token metadata package.
+- Parameters include the metadata account key (mint key), program ID (token 22), update authority (same as metadata pointer's payer dot key).
+- [**`16:42`**](https://youtu.be/l7EyQUlNAdw?t=1002) Each field has its own index in the additional fields array. We can extract values from our existing additional fields array by specifying their respective indices.
 
 [**`17:06`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1026)
 # Building Transaction with Instructions
 
 In this section, we learn how to build a transaction with all the necessary instructions and send it to be confirmed on the blockchain.
 
+```javascript
+const transaction = Transaction().add({
+    createAccountIx,
+    initializeMetadataPointerIx,
+    initializeMintIx,
+    initializeMetadataIx,
+    updateMetadataField
+  });
+```
+
 - We use web3.js library to create a new transaction object.
-- All previously created instructions are added to this transaction object using `add` method.
-- The order of adding instructions is important; some token extensions need to be initialized before the mint.
+- [**`17:39`**](https://youtu.be/l7EyQUlNAdw?t=1059) All previously created instructions are added to this transaction object using `add()` method.
+- [**`17:45`**](https://youtu.be/l7EyQUlNAdw?t=1065) The **order of adding instructions is important**; some token extensions need to be initialized before the mint.
 - Once the transaction is built, we can send and confirm it using the `sendAndConfirmTransaction` function.
 - The function requires a connection object, the transaction itself, and an array of signers (in this case, payer and mint keys).
 
@@ -175,26 +269,47 @@ In this section, we learn how to build a transaction with all the necessary inst
 
 Here we discuss how to send and confirm the transaction on the blockchain.
 
-- We use the `sendAndConfirmTransaction` function to send and confirm our transaction.
-- The function requires a connection object, the transaction itself, and an array of signers (payer and mint keys).
-- After confirmation, we can display the confirmed transaction details.
+```javascript
+const sig = await sendAndConfirmRawTransaction(
+    connection,
+    transaction,
+    [payer, mint]
+);
 
-[**`19:05`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1145)
+console.log("sig:", sig);
+```
+
+- We use the `sendAndConfirmRawTransaction()` function to send and confirm our transaction.
+- [**`18:51`**](https://youtu.be/l7EyQUlNAdw?t=1131) The function requires a connection object, the transaction itself, and an array of signers (payer and mint keys).
+- [**`19:11`**](https://youtu.be/l7EyQUlNAdw?t=1151) After confirmation, we can display the confirmed transaction details.
+
+
 # Logging Out the Signature
 
-In this section, the speaker discusses logging out just the signature.
+[**`19:16`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1150) In this section, the speaker discusses logging out just the signature.
 
-## Logging Out the Signature
+```javascript
+const chainMetada = await getTokenMetadata(
+    connection,
+    mint.publicKey,
+    [payer, mint]
+);
+
+console.log(chainMetada);
+```
+
 
 - The transaction needs to be confirmed by the blockchain before using helper functions in the SPL token metadata program.
 - To retrieve metadata, you need your connection to the same cluster and the mint address where the metadata is stored.
-- Use the `get token metadata` helper function from SPL token metadata program, passing in your connection and mint public key.
-- Open up the terminal and run `es run` (or `npxs run` if not installed globally) with your script to display the metadata once it's confirmed by the blockchain.
+- [**`19:46`**](https://youtu.be/l7EyQUlNAdw?t=1186) Use the `getTokenMetadata()` helper function from `spl-token'metadata` package, passing in your connection and mint public key.
+- [**`20:06`**](https://youtu.be/l7EyQUlNAdw?t=1206) Open up the terminal and run `esrun ./mint.ts` (or `npx esrun` if not installed globally) with your script to display the metadata once it's confirmed by the blockchain.
 
 [**`20:42`**](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1242)
 # Conclusion
 
 This section concludes how to use the token metadata extension on the token extension program.
+
+--------
 
 # Transcription
 
@@ -226,19 +341,19 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:00:58](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=58) ➜ and get to some coding so the first
 - [00:01:00](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=60) ➜ thing we're going to need to do is we're
 - [00:01:01](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=61) ➜ going to need to load in a key pair that
-- [00:01:03](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=63) ➜ has some devet soul create a connection
+- [00:01:03](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=63) ➜ has some devnet sol create a connection
 - [00:01:04](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=64) ➜ to the cluster itself create our mint
 - [00:01:06](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=66) ➜ and then we can actually fill in all the
 - [00:01:08](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=68) ➜ metadata we want so the first thing we
 - [00:01:09](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=69) ➜ going to do is go ahead and create that
 - [00:01:14](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=74) ➜ connection and like I said for this
 - [00:01:17](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=77) ➜ connection we're going to connect to
-- [00:01:18](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=78) ➜ devet so we can go ahead and load in the
-- [00:01:20](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=80) ➜ cluster URL for devet and then I'm going
+- [00:01:18](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=78) ➜ devnet so we can go ahead and load in the
+- [00:01:20](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=80) ➜ cluster URL for devnet and then I'm going
 - [00:01:23](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=83) ➜ to load in a payer key pairer that's
 - [00:01:24](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=84) ➜ going to actually pay for all the
 - [00:01:26](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=86) ➜ transactions and the cost of storage on
-- [00:01:28](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=88) ➜ the Salona Network and I'm actually
+- [00:01:28](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=88) ➜ the Solana Network and I'm actually
 - [00:01:30](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=90) ➜ going to use the helper library for this
 - [00:01:32](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=92) ➜ and I'm going to load in the key pair
 - [00:01:35](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=95) ➜ from the file system get key pair from
@@ -249,7 +364,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:01:47](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=107) ➜ CLI installed on my system so I can run
 - [00:01:49](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=109) ➜ Solana address and you can see there's
 - [00:01:51](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=111) ➜ this Nick b1d address and that's the
-- [00:01:52](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=112) ➜ devet address I'm going use to fund
+- [00:01:52](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=112) ➜ devnet address I'm going use to fund
 - [00:01:54](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=114) ➜ everything and I'm just going to load in
 - [00:01:56](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=116) ➜ that particular key pair uh using
 - [00:01:59](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=119) ➜ JavaScript using the helper and on Linux
@@ -257,11 +372,11 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:02:04](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=124) ➜ tilta sl. config Solana id.
 - [00:02:09](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=129) ➜ Json now that we have our payer and
 - [00:02:12](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=132) ➜ again this actual address has um some
-- [00:02:15](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=135) ➜ devet soul on it so you can see that I
+- [00:02:15](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=135) ➜ devnet sol on it so you can see that I
 - [00:02:17](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=137) ➜ don't need to do any aird drops in order
-- [00:02:18](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=138) ➜ to do this because I already have devet
-- [00:02:20](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=140) ➜ soul if you don't already have devet
-- [00:02:21](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=141) ➜ soul you can go ahead and do an airdrop
+- [00:02:18](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=138) ➜ to do this because I already have devnet
+- [00:02:20](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=140) ➜ sol if you don't already have devnet
+- [00:02:21](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=141) ➜ sol you can go ahead and do an airdrop
 - [00:02:23](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=143) ➜ easy day so next we're going to actually
 - [00:02:25](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=145) ➜ generate a new random mint this is going
 - [00:02:27](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=147) ➜ to be the mint address that our uh new
@@ -271,7 +386,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:02:36](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=156) ➜ generate and just for the sake of
 - [00:02:38](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=158) ➜ logging this out we'll go ahead and log
 - [00:02:40](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=160) ➜ it to the console just to show that the
-- [00:02:42](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=162) ➜ we have addresses here so mint dopu key.
+- [00:02:42](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=162) ➜ we have addresses here so mint dot key.
 - [00:02:45](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=165) ➜ 2 base
 - [00:02:50](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=170) ➜ 58 and then we'll go ahead and do the
 - [00:02:52](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=172) ➜ same thing for our payer just to log out
@@ -492,7 +607,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:10:38](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=638) ➜ of information we need the first
 - [00:10:40](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=640) ➜ parameter that we need for this
 - [00:10:41](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=641) ➜ instruction is our mint itself so that's
-- [00:10:43](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=643) ➜ our mint dopu key the next one is our
+- [00:10:43](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=643) ➜ our mint dot key the next one is our
 - [00:10:45](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=645) ➜ update Authority and this can be
 - [00:10:48](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=648) ➜ whatever uh address you want in my case
 - [00:10:51](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=651) ➜ I'm going to set this just to the payer
@@ -555,14 +670,14 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:13:02](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=782) ➜ one is in an object notation so we can
 - [00:13:05](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=785) ➜ pass in all the details that we need the
 - [00:13:07](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=787) ➜ first thing is our mint itself which
-- [00:13:09](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=789) ➜ like you guessed it is our mint dopu key
+- [00:13:09](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=789) ➜ like you guessed it is our mint dot key
 - [00:13:12](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=792) ➜ now we need our metadata account itself
 - [00:13:14](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=794) ➜ and like I mentioned earlier because
 - [00:13:16](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=796) ➜ we're initializing our mint to be our
 - [00:13:18](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=798) ➜ metadata account this is also going to
-- [00:13:21](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=801) ➜ be our mint dopu key and then if we need
+- [00:13:21](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=801) ➜ be our mint dot key and then if we need
 - [00:13:24](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=804) ➜ to provide a mint a mint Authority in
-- [00:13:26](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=806) ➜ this case we're using our payer dopu key
+- [00:13:26](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=806) ➜ this case we're using our payer dot key
 - [00:13:29](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=809) ➜ since we already have that and now we
 - [00:13:30](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=810) ➜ can actually pass in the metadata
 - [00:13:32](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=812) ➜ information that we want so since we
@@ -578,7 +693,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:14:02](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=842) ➜ which is going to be our token 22
 - [00:14:04](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=844) ➜ program ID
 - [00:14:05](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=845) ➜ constant and the update Authority which
-- [00:14:08](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=848) ➜ is our payer dopu key so now you can see
+- [00:14:08](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=848) ➜ is our payer dot key so now you can see
 - [00:14:11](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=851) ➜ our type errors have gone away we have
 - [00:14:12](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=852) ➜ all of our required information in here
 - [00:14:15](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=855) ➜ and notice here on creating this
@@ -601,7 +716,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:15:00](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=900) ➜ helper actually comes from the SPL token
 - [00:15:02](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=902) ➜ metadata package as well and we can pass
 - [00:15:04](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=904) ➜ in all the information we need like our
-- [00:15:07](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=907) ➜ metadata account which is our mint dopu
+- [00:15:07](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=907) ➜ metadata account which is our mint dot
 - [00:15:10](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=910) ➜ key we need our program ID which is
 - [00:15:13](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=913) ➜ token 22 the token extension program the
 - [00:15:17](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=917) ➜ update Authority and this one is super
@@ -610,7 +725,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:15:22](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=922) ➜ your
 - [00:15:23](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=923) ➜ Mint or sorry on your metadata pointer
 - [00:15:27](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=927) ➜ so when we initialize our met data
-- [00:15:28](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=928) ➜ pointer we're saying our payer dopu key
+- [00:15:28](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=928) ➜ pointer we're saying our payer dot key
 - [00:15:31](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=931) ➜ is our actual metadata update Authority
 - [00:15:35](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=935) ➜ same thing right here when we're
 - [00:15:36](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=936) ➜ actually initializing the metadata
@@ -717,7 +832,7 @@ This section concludes how to use the token metadata extension on the token exte
 - [00:19:27](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1167) ➜ bits of information
 - [00:19:28](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1168) ➜ specifically you need your connection to
 - [00:19:30](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1170) ➜ the exact same cluster in this case
-- [00:19:31](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1171) ➜ devet that we connected to and then you
+- [00:19:31](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1171) ➜ devnet that we connected to and then you
 - [00:19:34](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1174) ➜ just need the mint address because
 - [00:19:35](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1175) ➜ that's the address that we actually put
 - [00:19:37](https://www.youtube.com/watch?v=l7EyQUlNAdw?t=1177) ➜ our metadata on our metadata lives on
